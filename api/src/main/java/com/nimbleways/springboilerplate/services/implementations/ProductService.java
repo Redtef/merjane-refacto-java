@@ -36,29 +36,31 @@ public class ProductService {
         }
     }
 
-    private void notifyDelay(Product product) {
-        productRepository.save(product);
+    public void notifyDelay(Product product) {
         notificationService.sendDelayNotification(product.getLeadTime(), product.getName());
     }
 
-    private void handleSeasonalProduct(Product p) {
-        boolean isWithinSeason = LocalDate.now().isAfter(p.getSeasonStartDate()) && LocalDate.now().isBefore(p.getSeasonEndDate());
-        boolean hasStock = p.getAvailable() > 0;
+    private void handleSeasonalProduct(Product product) {
+        boolean isWithinSeason = LocalDate.now().isAfter(product.getSeasonStartDate()) && LocalDate.now().isBefore(product.getSeasonEndDate());
+        boolean hasStock = product.getAvailable() > 0;
 
         if (isWithinSeason && hasStock) {
-            p.setAvailable(p.getAvailable() - 1);
-            productRepository.save(p);
+            product.setAvailable(product.getAvailable() - 1);
+            productRepository.save(product);
         } else {
-            boolean leadTimeAfterSeasonEnd = LocalDate.now().plusDays(p.getLeadTime()).isAfter(p.getSeasonEndDate());
+            boolean leadTimeAfterSeasonEnd = LocalDate.now().plusDays(product.getLeadTime()).isAfter(product.getSeasonEndDate());
             if (leadTimeAfterSeasonEnd) {
-                notificationService.sendOutOfStockNotification(p.getName());
-                p.setAvailable(0);
-                productRepository.save(p);
-            } else if (p.getSeasonStartDate().isAfter(LocalDate.now())) {
-                notificationService.sendOutOfStockNotification(p.getName());
-                productRepository.save(p);
+                // season ended
+                notificationService.sendOutOfStockNotification(product.getName());
+                product.setAvailable(0);
+                productRepository.save(product);
+            } else if (product.getSeasonStartDate().isAfter(LocalDate.now())) {
+                // season Not started
+                notificationService.sendOutOfStockNotification(product.getName());
+                productRepository.save(product);
             } else {
-                notifyDelay(p);
+                // inside season
+                notifyDelay(product);
             }
         }
     }
@@ -79,6 +81,7 @@ public class ProductService {
         if (product.getAvailable() > 0) {
             product.setAvailable(product.getAvailable() - 1);
         }
+        productRepository.save(product);
         notifyDelay(product);
     }
 }
