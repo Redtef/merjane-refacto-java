@@ -39,13 +39,8 @@ public class MyController {
         // fetch order
         Order order = orderService.getOrder(orderId);
 
-        // what is this used for ?
-//        List<Long> ids = new ArrayList<>();
-//        ids.add(orderId);
-        Set<Product> products = order.getItems();
-        for (Product product : products) {
-           productService.handleProduct(product);
-        }
+           productService.handleProducts(order.getItems());
+
 
         return new ProcessOrderResponse(order.getId());
     }

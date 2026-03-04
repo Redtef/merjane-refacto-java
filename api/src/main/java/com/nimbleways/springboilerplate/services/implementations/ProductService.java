@@ -1,6 +1,7 @@
 package com.nimbleways.springboilerplate.services.implementations;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,5 +84,11 @@ public class ProductService {
         }
         productRepository.save(product);
         notifyDelay(product);
+    }
+
+    public void handleProducts(Set<Product> items) {
+        for (Product product : items) {
+            handleProduct(product);
+        }
     }
 }
