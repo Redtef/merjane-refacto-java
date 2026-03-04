@@ -12,10 +12,13 @@ import com.nimbleways.springboilerplate.repositories.ProductRepository;
 public class ProductService {
 
     @Autowired
-    ProductRepository pr;
+    ProductRepository productRepository;
 
     @Autowired
-    NotificationService ns;
+    NotificationService notificationService;
+
+
+
 
     public void notifyDelay(int leadTime, Product p) {
         p.setLeadTime(leadTime);
