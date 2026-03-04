@@ -44,33 +44,7 @@ public class MyController {
 //        ids.add(orderId);
         Set<Product> products = order.getItems();
         for (Product product : products) {
-            if (product.getType().equals("NORMAL")) {
-                if (product.getAvailable() > 0) {
-                    product.setAvailable(product.getAvailable() - 1);
-                    pr.save(product);
-                } else {
-                    int leadTime = product.getLeadTime();
-                    if (leadTime > 0) {
-                        ps.notifyDelay(leadTime, product);
-                    }
-                }
-            } else if (product.getType().equals("SEASONAL")) {
-                // Add new season rules
-                if ((LocalDate.now().isAfter(product.getSeasonStartDate()) && LocalDate.now().isBefore(product.getSeasonEndDate())
-                        && product.getAvailable() > 0)) {
-                    product.setAvailable(product.getAvailable() - 1);
-                    pr.save(product);
-                } else {
-                    ps.handleSeasonalProduct(product);
-                }
-            } else if (product.getType().equals("EXPIRABLE")) {
-                if (product.getAvailable() > 0 && product.getExpiryDate().isAfter(LocalDate.now())) {
-                    product.setAvailable(product.getAvailable() - 1);
-                    pr.save(product);
-                } else {
-                    ps.handleExpiredProduct(product);
-                }
-            }
+           productService.handleProduct(product);
         }
 
         return new ProcessOrderResponse(order.getId());
